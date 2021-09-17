@@ -43,24 +43,26 @@
         </span>
         количеством
         <span class="field">
-          <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ days }}</span>
+          <span style="text-align: center;" contenteditable @input="(e) => days = e.target.innerHTML" @keydown="preventLineBreaks">{{ days }}</span>
           <span class="help hide-in-print">дней</span>
         </span>
-        календарных дней, перенести на период
+        {{ declOfNum(days, ['календарный', 'календарных', 'календарных']) }}
+        {{ declOfNum(days, ['день', 'дня', 'дней']) }}, перенести на период
         <span v-for="(period, index) in periods" :key="index">
           c
           <span class="field">
             <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ period.start }}</span>
             <span class="help hide-in-print">начало отпуска</span>
           </span>
-          -
+          –
           <span class="field">
-            <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ period.days }}</span>
+            <span style="text-align: center;" contenteditable @input="(e) => period.days = e.target.innerHTML" @keydown="preventLineBreaks">{{ period.days }}</span>
             <span class="help hide-in-print">дней</span>
           </span>
-          календарных дней<span v-if="periods.length < 5">➕</span>{{ index == periods.length - 1 ? '.' : ',' }}
+          {{ declOfNum(period.days, ['календарный', 'календарных', 'календарных']) }}
+          {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}<span v-if="periods.length > 1" class="btn hide-in-print" @click="() => removePeriod(index)">➖</span>{{ index == periods.length - 1 ? '.' : ',' }}
         </span>
-        <span v-if="periods.length < 5">➕</span>
+        <span v-if="periods.length < 5" class="btn hide-in-print" @click="addPeriod">➕</span>
       </p>
     </div>
 
@@ -110,8 +112,8 @@
 
 <script>
   export default {
-    name: 'RedistributuinTemplate',
-    title: 'перенос отпуска',
+    name: 'redistribution',
+    title: 'Заявление на перенос отпуска',
 
     data () {
       return {
@@ -151,16 +153,23 @@
       },
     },
     methods: {
-      preventLineBreaks (e) { if(e.which == 13) e.preventDefault(); }
+      preventLineBreaks(e) {
+        if(e.which == 13) e.preventDefault()
+      },
+      removePeriod(index) {
+        this.periods.splice(index, 1)
+      },
+      addPeriod: function() {
+        this.periods.push({ start: '09.10.2021', days: 14 })
+      },
+      declOfNum(n, titles) {
+        return titles[n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
+      },
     },
   }
 </script>
 
 <style scoped>
-  @font-face {
-    font-family: 'Times NR Cyr MT';
-    src: url('../assets/Times_NR_Cyr_MT.ttf')  format('truetype');
-  }
   .header {
     margin-left: 55%;
   }
@@ -228,5 +237,8 @@
     flex-direction: column;
     justify-content: stretch;
     height: 257mm;
+  }
+  .btn:hover {
+    opacity: 0.6;
   }
 </style>

@@ -2,3 +2,5 @@
 
 import './app'
 import './template'
+import './vue-meta'
+import './webfontloader'

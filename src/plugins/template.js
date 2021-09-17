@@ -15,7 +15,7 @@ for (const file of requireTemplate.keys()) {
   const templateConfig = requireTemplate(file)
   templates.push({
     title: templateConfig.default.title || templateConfig.default.name,
-    name: templateConfig.default.name
+    name: templateConfig.default.name,
   })
 
   Vue.component(

@@ -38,28 +38,34 @@
         </span>
         количеством
         <span class="field">
-          <span style="text-align: center;" contenteditable @input="(e) => this.range.days = e.target.innerHTML" @keydown="preventLineBreaks">{{ range.days }}</span>
+          <span style="text-align: center;" contenteditable @input="(e) => range.days = e.target.innerHTML" @keydown="preventLineBreaks">{{ range.days }}</span>
           <span class="help hide-in-print">дней</span>
         </span>
-        {{ range.days == 1 ? 'календарный день' : 'календарных дней' }}.
+        {{ declOfNum(range.days, ['календарный', 'календарных', 'календарных']) }}
+        {{ declOfNum(range.days, ['день', 'дня', 'дней']) }}.
       </p>
       <div class="hide-in-print toolbox">
         <p>Запросить выплаты в соответствии с Положением о муниципальной службе в городе Твери:</p>
         <p>
           <label class="hide-in-print" style="margin-left: 10px">
-            <input
-              v-for="(matpom, index) in payments.matpom"
-              v-model="payments.matpom[index]"
-              type="checkbox"
-              :key="index"
-            />
-            Метериальная помощь
+            <template v-for="(matpom, index) in payments.matpom">
+              <input
+                v-if="(index == 0) || payments.matpom[0]"
+                v-model="payments.matpom[index]"
+                type="checkbox"
+                :key="index"
+                style="margin-right: 5px"
+              />
+            </template>Материальная помощь
           </label>
         </p>
         <p>
           <label class="hide-in-print" style="margin-left: 10px">
-            <input type="checkbox" v-model="payments.densod">
-            Денежное содержание
+            <input
+              v-model="payments.densod"
+              type="checkbox"
+              style="margin-right: 5px"
+            >Денежное содержание
           </label>
         </p>
       </div>
@@ -118,8 +124,8 @@
 
 <script>
   export default {
-    name: 'VacationTemplate',
-    title: 'заявление на отпуск',
+    name: 'vacation',
+    title: 'Заявление на предоставление ежегодного оплачиваемого отпуска',
 
     data () {
       return {
@@ -161,16 +167,24 @@
       },
     },
     methods: {
-      preventLineBreaks (e) { if(e.which == 13) e.preventDefault(); }
+      preventLineBreaks(e) {
+        if(e.which == 13) e.preventDefault()
+      },
+      declOfNum(n, titles) {
+        return titles[n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
+      },
+    },
+    watch: {
+      'payments.matpom'(nmp) {
+        if(!nmp[0]) {
+          this.payments.matpom[1] = false
+        }
+      }
     },
   }
 </script>
 
 <style scoped>
-  @font-face {
-    font-family: 'Times NR Cyr MT';
-    src: url('../assets/Times_NR_Cyr_MT.ttf')  format('truetype');
-  }
   .header {
     margin-left: 55%;
   }
