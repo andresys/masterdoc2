@@ -19,8 +19,7 @@
 <script>
 import VueFileToolbarMenu from 'vue-file-toolbar-menu'
 import VueDocumentEditor from 'vue-document-editor'
-import Templates from '@/plugins/template'
-// import { get } from 'vuex-pathify'
+import { get, sync } from 'vuex-pathify'
 
 export default {
   components: { VueDocumentEditor, VueFileToolbarMenu },
@@ -104,6 +103,8 @@ export default {
   },
   // mounted () { this.mounted = true },
   computed: {
+    ...get ('app', ['templates']),
+    document: sync('document'),
     template () {
       return this.$route.params.template
     },
@@ -230,7 +231,6 @@ export default {
       const template = this.templates.find((template) => (template.name == this.template))
       return template ? template.title : undefined 
     },
-    templates: () => Templates, // заменить на pathify
     // Formats management
     current_format_name () {
       const format = this.formats.find(([, width_mm, height_mm]) => (this.page_format_mm[0] == width_mm && this.page_format_mm[1] == height_mm));
@@ -362,7 +362,7 @@ export default {
       immediate: true,
       handler (new_template) {
         this.resetContentHistory()
-        this.content = Array({ template: new_template, props: [] })
+        this.content = Array({ template: new_template, props: { ...this.document[this.template] } })
       }
     }
   },

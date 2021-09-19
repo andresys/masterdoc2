@@ -125,35 +125,15 @@
 <script>
   export default {
     name: 'vacation',
-    title: 'Заявление на предоставление ежегодного оплачиваемого отпуска',
 
-    data () {
-      return {
-        to: {
-          title: 'Главе города Твери',
-          name: 'А.В. Огонькову',
-        },
-        from: {
-          title: 'заместителя начальника отдела информационных ресурсов и технологий',
-          name: 'Кудрявцева Михаила Витальевича',
-        },
-        range: {
-          start: '06.09.2021',
-          end: '25.10.2021',
-          days: 1,
-        },
-        payments: {
-          matpom: [true, false],
-          densod: false,
-        },
-        visa: {
-          required: true,
-          title: 'Начальник отдела информационных ресурсов и технологий',
-          name: 'А.В. Исаев',
-        },
-        date: '06.09.2021',
-        name: 'Кудрявцев М.В.',
-      }
+    props: {
+      to: Object,
+      from: Object,
+      range: Object,
+      payments: Object,
+      visa: Object,
+      date: String,
+      name: String,
     },
     computed: {
       payment_required () {

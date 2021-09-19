@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="error_page">
     <picture>
       <svg width="215" height="215" viewBox="0 0 215 215" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="107.5" cy="107.5" r="107.5" fill="#444444"/>
@@ -28,9 +28,8 @@
   export default { name: 'ErrorView' }
 </script>
 
-<style scope>
-  @import url('https://fonts.googleapis.com/css2?family=Pavanam&display=swap');
-  main {
+<style scope lang="scss">
+  main.error_page {
     height: 100%;
     font-family: Pavanam;
     font-style: normal;
@@ -40,31 +39,31 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-  h1 {
-    margin-top: 14px;
-    font-size: 96px;
-    line-height: 124px;
-    font-weight: normal;
-  }
-  h2 {
-    margin-top: 10px;
-    font-family: Pavanam;
-    font-weight: normal;
-    font-size: 26px;
-    line-height: 34px;
-    color: #9D9999;
-  }
-  div {
-    margin-top: 10px;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 22px;
-    text-align: center;
-  }
-  a {
-    color: #2BA3D4;
-    text-decoration: none;
-    cursor: pointer;
+    h1 {
+      margin-top: 14px;
+      font-size: 96px;
+      line-height: 124px;
+      font-weight: normal;
+    }
+    h2 {
+      margin-top: 10px;
+      font-family: Pavanam;
+      font-weight: normal;
+      font-size: 26px;
+      line-height: 34px;
+      color: #9D9999;
+    }
+    div {
+      margin-top: 10px;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      text-align: center;
+    }
+    a {
+      color: #2BA3D4;
+      text-decoration: none;
+      cursor: pointer;
+    }
   }
 </style>
