@@ -4,8 +4,7 @@
 
 <script>
   // Styles
-  // import '@/styles/overrides.sass'
-
+  import '@/styles/fonts.scss'
 
   export default {
     name: 'MasterDoc',
@@ -32,6 +31,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: black;
-    background: rgb(248, 249, 250);
+    background: rgba(200, 250, 230, 0.2);
+  }
+  .container {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 0 10px;
   }
 </style>

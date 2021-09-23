@@ -15,14 +15,14 @@ const store = new Vuex.Store({
   ],
 })
 
-// store.subscribe(mutation => {
-//   if (!mutation.type.startsWith('user/')) return
+store.dispatch('document/fetch')
 
-//   store.dispatch('user/update', mutation)
-// })
+store.subscribe(mutation => {
+  if (!mutation.type.startsWith('document/')) return
 
-// store.dispatch('app/init')
+  store.dispatch('document/update', mutation)
+})
 
 export default store
 
-// export const ROOT_DISPATCH = Object.freeze({ root: true })
+export const ROOT_DISPATCH = Object.freeze({ root: true })

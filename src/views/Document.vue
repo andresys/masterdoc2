@@ -5,8 +5,8 @@
     <vue-file-toolbar-menu :content="menu" class="bar" />
 
     <!-- Document editor -->
-    <vue-document-editor class="editor" ref="editor"
-      :content.sync="content"
+    <vue-document-editor ref="editor"
+      :content="content"
       :overlay="overlay"
       :zoom="zoom"
       :page_format_mm="page_format_mm"
@@ -19,14 +19,13 @@
 <script>
 import VueFileToolbarMenu from 'vue-file-toolbar-menu'
 import VueDocumentEditor from 'vue-document-editor'
-import { get, sync } from 'vuex-pathify'
+import { get } from 'vuex-pathify'
 
 export default {
   components: { VueDocumentEditor, VueFileToolbarMenu },
   data () {
     return {
       // This is where the pages content is stored and synced
-      content: [],
       zoom: 1.0,
       zoom_min: 0.10,
       zoom_max: 5.0,
@@ -34,8 +33,9 @@ export default {
       page_margins: "20mm",
       display: "vertical", // ["grid", "vertical", "horizontal"]
       // mounted: false, // will be true after this component is mounted
-      undo_count: -1, // contains the number of times user can undo (= current position in content_history)
-      content_history: [] // contains the content states for undo/redo operations
+      // undo_count: -1, // contains the number of times user can undo (= current position in content_history)
+      // content_history: [], // contains the content states for undo/redo operations
+      font_class: null,
     }
   },
   created () {
@@ -90,24 +90,22 @@ export default {
       start_zoom_touch = false;
     }, { passive: false });
     // Manage history undo/redo events
-    const manage_undo_redo = (e) => {
-      switch(e && e.inputType){
-        case "historyUndo": e.preventDefault(); e.stopPropagation(); this.undo(); break;
-        case "historyRedo": e.preventDefault(); e.stopPropagation(); this.redo(); break;
-      }
-    }
-    window.addEventListener("beforeinput", manage_undo_redo);
-    window.addEventListener("input", manage_undo_redo); // in case of beforeinput event is not implemented (Firefox)
+    // const manage_undo_redo = (e) => {
+    //   switch(e && e.inputType){
+    //     case "historyUndo": e.preventDefault(); e.stopPropagation(); this.undo(); break;
+    //     case "historyRedo": e.preventDefault(); e.stopPropagation(); this.redo(); break;
+    //   }
+    // }
+    // window.addEventListener("beforeinput", manage_undo_redo);
+    // window.addEventListener("input", manage_undo_redo); // in case of beforeinput event is not implemented (Firefox)
     // If your component is susceptible to be destroyed, don't forget to
     // use window.removeEventListener in the Vue.js beforeDestroy handler
   },
   // mounted () { this.mounted = true },
   computed: {
     ...get ('app', ['templates']),
-    document: sync('document'),
-    template () {
-      return this.$route.params.template
-    },
+    content () { return Array({ template: this.template, props: { class: null }}) },
+    template () { return this.$route.params.template },
     // This is the menu content
     menu () {
       return [
@@ -121,9 +119,9 @@ export default {
         { text: "Печать", title: "Печать документа", icon: "print", click: () => window.print() },
         { is: "spacer" },
         // Undo / redo commands
-        { title: "Отменить", icon: "undo", disabled: !this.can_undo, hotkey: this.isMacLike ? "command+z" : "ctrl+z", click: () => this.undo() },
-        { title: "Повторить", icon: "redo", disabled: !this.can_redo, hotkey: this.isMacLike ? "shift+command+z" : "ctrl+y", click: () => this.redo() },
-        { is: "spacer" },
+        // { title: "Отменить", icon: "undo", disabled: !this.can_undo, hotkey: this.isMacLike ? "command+z" : "ctrl+z", click: () => this.undo() },
+        // { title: "Повторить", icon: "redo", disabled: !this.can_redo, hotkey: this.isMacLike ? "shift+command+z" : "ctrl+y", click: () => this.redo() },
+        // { is: "spacer" },
         // Rich text menus
         // { icon: "format_align_left", title: "Выравнивать по левому краю", active: this.isLeftAligned, disabled: !this.current_text_style, hotkey: this.isMacLike ? "shift+command+l" : "ctrl+shift+l", click: () => document.execCommand("justifyLeft") },
         // { icon: "format_align_center", title: "Выравнивать по центру", active: this.isCentered, disabled: !this.current_text_style, hotkey: this.isMacLike ? "shift+command+e" : "ctrl+shift+e", click: () => document.execCommand("justifyCenter") },
@@ -175,6 +173,33 @@ export default {
         //   menu_width: 200,
         //   menu_class: "align-center"
         // },
+        { // Font type
+          text: "Шрифт",
+          icon: "format_size",
+          title: "Шрифт документа",
+          chevron: true,
+          menu: [
+            [ "Times New Roman", null ],
+            [ "Eskal Font4You", "ruk1" ],
+            [ "Katherine Plus", "ruk2" ],
+            [ "Old Classic", "ruk3" ],
+            [ "Carolina", "ruk4" ],
+            [ "English Script", "ruk6" ],
+            [ "Marianna", "ruk7" ],
+            [ "Denistina", "ruk8" ],
+            [ "Shlapak Script", "ruk10" ],
+            [ "StudioScriptTT", "ruk12" ],
+            [ "ScriptC", "ruk14" ],
+          ].map(([font, font_class]) => {
+            return {
+              html: '<span style="font-family: \'' + font + '\'">' + font + '</span>',
+              title: font,
+              active: this.font_class == font_class,
+              click: () => { this.font_class = font_class }
+            }
+          }),
+          // menu_width: 180,
+        },
         { // Zoom menu
           text: Math.floor(this.zoom * 100) + "%",
           title: "Масштаб",
@@ -289,10 +314,10 @@ export default {
     // isH3 () { return this.current_text_style.headerLevel == 3; },
     // curColor () { return this.current_text_style.color || "transparent"; },
     // Platform management
-    isMacLike: () => /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform),
+    // isMacLike: () => /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform),
     // Undo / redo flags
-    can_undo () { return this.undo_count > 0; },
-    can_redo () { return this.content_history.length - this.undo_count - 1 > 0; }
+    // can_undo () { return this.undo_count > 0; },
+    // can_redo () { return this.content_history.length - this.undo_count - 1 > 0; }
   },
   methods: {
     // Page overlays (headers, footers, page numbers)
@@ -309,9 +334,9 @@ export default {
       return html;
     },
     // Undo / redo functions examples
-    undo () { if(this.can_undo){ this._mute_next_content_watcher = true; this.content = this.content_history[--this.undo_count]; } },
-    redo () { if(this.can_redo){ this._mute_next_content_watcher = true; this.content = this.content_history[++this.undo_count]; } },
-    resetContentHistory () { this.content_history = []; this.undo_count = -1; },
+    // undo () { if(this.can_undo){ this._mute_next_content_watcher = true; this.content = this.content_history[--this.undo_count]; } },
+    // redo () { if(this.can_redo){ this._mute_next_content_watcher = true; this.content = this.content_history[++this.undo_count]; } },
+    // resetContentHistory () { this.content_history = []; this.undo_count = -1; },
     // Insert page break function example
     // async insertPageBreak () {
     //   // insert paragraph at caret position
@@ -347,30 +372,36 @@ export default {
     // },
   },
   watch: {
-    content: {
+    // content: {
+    //   immediate: true,
+    //   // Fill undo / redo history stack on user input
+    //   handler (new_content) {
+    //     if(!this._mute_next_content_watcher) { // only update the stack when content is changed by user input, not undo/redo commands
+    //       this.content_history[++this.undo_count] = new_content;
+    //       this.content_history.length = this.undo_count + 1; // remove all redo items
+    //     }
+    //     this._mute_next_content_watcher = false;
+    //   }
+    // },
+    // template: {
+    //   immediate: true,
+    //   handler (new_template) {
+    //     this.resetContentHistory()
+    //     this.content = Array({ template: new_template, props: { class: null }})
+    //   }
+    // },
+    font_class: {
       immediate: true,
-      // Fill undo / redo history stack on user input
-      handler (new_content) {
-        if(!this._mute_next_content_watcher) { // only update the stack when content is changed by user input, not undo/redo commands
-          this.content_history[++this.undo_count] = new_content;
-          this.content_history.length = this.undo_count + 1; // remove all redo items
-        }
-        this._mute_next_content_watcher = false;
+      handler (new_font_class) {
+        this.content.forEach((page) => { page.props['class'] = new_font_class })
       }
     },
-    template: {
-      immediate: true,
-      handler (new_template) {
-        this.resetContentHistory()
-        this.content = Array({ template: new_template, props: { ...this.document[this.template] } })
-      }
-    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       // экземпляр компонента доступен как `vm`
       let exist = vm.templates.map((val) => val.name).includes(vm.template)
-      if(!exist) { next('/error') }
+      if(!exist) { next('/error404') }
     })
   },
 }
@@ -393,19 +424,17 @@ export default {
   ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(0, 0, 0, 0.8);
   }
-  *[contenteditable=true] {
-    background: rgba(200, 250, 230, 0.2);
-    transition: padding 0.05s linear;
+  .template .hide-in-print, .template .hide-in-print p {
+    font-family: initial !important;
+    line-height: initial !important;
+    text-transform: initial !important;
+    font-weight: initial !important;
+    color: initial !important;
   }
-  span[contenteditable=true] {
-  }
-  span[contenteditable=true]:focus {
-    /* padding: 0 4px; */
+  .content[contenteditable=true] {
+    background: initial;
   }
   @media print {
-    *[contenteditable=true], input {
-      background: none;
-    }
     .hide-in-print {
       display: none;
     }

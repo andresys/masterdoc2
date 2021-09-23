@@ -1,121 +1,112 @@
 <template>
-  <div class="template">
+  <div class="template" ref="template">
     <div class="header">
-      <p class="field">
-        <span contenteditable @keydown="preventLineBreaks">{{ to.title }}</span>
-        <span class="help hide-in-print">должность руководителя</span>
-      </p>
-      <p class="field">
-        <span contenteditable @keydown="preventLineBreaks">{{ to.name }}</span>
-        <span class="help hide-in-print">Ф.И.О. руководителя</span>
-      </p>
-      <p style="position: absolute; padding-left: 5px;">от</p>
-      <p class="field">
-        <span style="text-indent: 24px;" contenteditable @keydown="preventLineBreaks">{{ from.title }}</span>
-        <span class="help hide-in-print">должность заявителя</span>
-      </p>
-      <p class="field">
-        <span contenteditable @keydown="preventLineBreaks">{{ from.name }}</span>
-        <span class="help hide-in-print">Ф.И.О. заявителя</span>
-      </p>
+      <field-component full v-model="to_title" help="должность руководителя"/>
+      <field-component full v-model="to_name" help="Ф.И.О. руководителя"/>
+      <field-component full v-model="from_title" help="должность заявителя" before="от "/>
+      <field-component full v-model="from_name" help="Ф.И.О. заявителя"/>
     </div>
 
     <div class="caption" style="margin-top: 40px;">
-      <p>заявление</p>
+      <p>Заявление</p>
     </div>
 
     <div class="content" style="margin-top: 20px;">
-      <p>
-        Прошу предоставить ежегодный оплачиваемый отпуск c
-        <span class="field">
-          <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ range.start }}</span>
-          <span class="help hide-in-print">дата начала</span>
-        </span>
-        по
-        <span class="field">
-          <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ range.end }}</span>
-          <span class="help hide-in-print">дата окончания</span>
-        </span>
-        количеством
-        <span class="field">
-          <span style="text-align: center;" contenteditable @input="(e) => range.days = e.target.innerHTML" @keydown="preventLineBreaks">{{ range.days }}</span>
-          <span class="help hide-in-print">дней</span>
-        </span>
-        {{ declOfNum(range.days, ['календарный', 'календарных', 'календарных']) }}
-        {{ declOfNum(range.days, ['день', 'дня', 'дней']) }}.
-      </p>
-      <div class="hide-in-print toolbox">
-        <p>Запросить выплаты в соответствии с Положением о муниципальной службе в городе Твери:</p>
-        <p>
-          <label class="hide-in-print" style="margin-left: 10px">
-            <template v-for="(matpom, index) in payments.matpom">
+      <toolbox>
+        <div>
+          <p>Запросить выплаты в соответствии с Положением о муниципальной службе в городе Твери:</p>
+          <p style="margin-top: 10px">
+            <label class="hide-in-print" style="margin-left: 10px">
               <input
-                v-if="(index == 0) || payments.matpom[0]"
-                v-model="payments.matpom[index]"
+                v-model="matpom1"
                 type="checkbox"
-                :key="index"
                 style="margin-right: 5px"
               />
-            </template>Материальная помощь
-          </label>
-        </p>
-        <p>
-          <label class="hide-in-print" style="margin-left: 10px">
-            <input
-              v-model="payments.densod"
-              type="checkbox"
-              style="margin-right: 5px"
-            >Денежное содержание
-          </label>
-        </p>
-      </div>
+              <input
+                v-if="matpom1"
+                v-model="matpom2"
+                type="checkbox"
+                style="margin-right: 5px"
+              />Материальная помощь
+            </label>
+          </p>
+          <p>
+            <label class="hide-in-print" style="margin-left: 10px">
+              <input
+                v-model="densod"
+                type="checkbox"
+                style="margin-right: 5px"
+              >Денежное содержание
+            </label>
+          </p>
+          <p style="margin-top: 10px">
+            <label class="hide-in-print">
+              <input
+                v-model="perfomance_required"
+                type="checkbox"
+                style="margin-right: 5px"
+              />Возложить исполнение должностных обязанностей
+            </label>
+          </p>
+          <p style="margin-top: 10px">
+            <label>
+              <input type="checkbox" v-model="visa_required">
+              Завизировать заявление
+            </label>
+          </p>
+        </div>
+      </toolbox>
+      <p>
+        Прошу предоставить ежегодный оплачиваемый отпуск c
+        <field-component v-model="start" help="дата начала" fieldStyle="text-align: center"/>
+        по
+        <field-component v-model="end" help="дата окончания" fieldStyle="text-align: center"/>
+        количеством
+        <field-component v-model="days" help="дней" fieldStyle="text-align: center"/>
+        {{ declOfNum(days, ['календарный', 'календарных', 'календарных']) }}
+        {{ declOfNum(days, ['день', 'дня', 'дней']) }}.
+      </p>
+      
       <p v-if="payment_required">
         В связи с уходом в ежегодный оплачиваемый отпуск прошу
         <template v-if="has_matpom">выплатить {{ this.two_matpom ? 'две материальных помащи' : 'материальную помощь' }} в размере денежного содержания,</template>
-        <template v-if="has_matpom && payments.densod"> а также </template>
-        <template v-if="payments.densod">произвести единовременную выплату в размере денежного содержания,</template>
+        <template v-if="has_matpom && densod"> а также </template>
+        <template v-if="densod">произвести единовременную выплату в размере денежного содержания,</template>
         в соответствии с Положением о муниципальной службе в городе Твери.
+      </p>
+
+      <p v-if="perfomance_required">
+        На время ежегодного оплачиваемого отпуска исполнение обязанностей
+        <field-component v-model="perfomance_title" help="должность лица исполняющего обязанности"/>
+        прошу возложить на
+        <field-component v-model="perfomance_name" help="Ф.И.О. лица исполняющего обязанности"/>.
       </p>
     </div>
 
-    <div class="footer" style="margin-top: 60px;">
-      <p class="field">
-        <span style="display: flex; gap: 5px;">
-          «
-          <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">06</span>
-          »
-          <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">сентября</span>
-          <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">2021</span>
-          г.
-        </span>
-        <span class="help hide-in-print">дата заявления</span>
-      </p>
-      <p class="field">
-        <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ name }}</span>
-        <span class="help hide-in-print">Ф.И.О. заявителя</span>
-      </p>
+    <div style="margin-top: 60px; flex-grow: 1;">
+      <div class="footer">
+        <field-component full v-model="date" help="дата заявления" fieldStyle="text-align: center"/>
+        <!--p class="field">
+          <span style="display: flex; gap: 5px;">
+            «
+            <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">06</span>
+            »
+            <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">сентября</span>
+            <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">2021</span>
+            г.
+          </span>
+          <span class="help hide-in-print">дата заявления</span>
+        </p-->
+        <field-component full v-model="name" help="Ф.И.О. заявителя" fieldStyle="text-align: center"/>
+      </div>
     </div>
 
     <div class="visa">
-      <div class="hide-in-print toolbox">
-        <p>
-          <label>
-            <input type="checkbox" v-model="visa.required">
-            Завизировать заявление
-          </label>
-        </p>
-      </div>
-      <div :style="{visibility: visa.required ? 'visible' : 'hidden'}">
+      <div :style="{visibility: visa_required ? 'visible' : 'hidden'}">
         <p style="text-transform: uppercase; font-weight: 700; padding-left: 5px;">Согласовано:</p>
         <div>
-          <p class="field" style="max-width: 60%;">
-            <span contenteditable @keydown="preventLineBreaks">{{ visa.title }}</span>
-            <span class="help hide-in-print">должность</span>
-          </p>
-          <p class="field">
-            <span style="text-align: center;" contenteditable @keydown="preventLineBreaks">{{ visa.name }}</span>
-            <span class="help hide-in-print">Ф.И.О.</span>
-          </p>
+          <field-component full v-model="visa_title" help="должность" style="max-width: 60%;"/>
+          <field-component full v-model="visa_name" help="Ф.И.О." fieldStyle="text-align: center"/>
         </div>
       </div>
     </div>
@@ -123,27 +114,23 @@
 </template>
 
 <script>
+  import { sync } from 'vuex-pathify'
+  import FieldComponent from '@/components/FieldComponent.vue'
+  import Toolbox from '@/components/Toolbox.vue'
+
   export default {
     name: 'vacation',
-
-    props: {
-      to: Object,
-      from: Object,
-      range: Object,
-      payments: Object,
-      visa: Object,
-      date: String,
-      name: String,
-    },
+    components: { FieldComponent, Toolbox },
     computed: {
+      ...sync('document/vacation@*'),
       payment_required () {
-        return this.has_matpom || this.payments.densod
+        return this.has_matpom || this.densod
       },
       two_matpom () {
-        return this.payments.matpom[0] && this.payments.matpom[1]
+        return this.matpom1 && this.matpom2
       },
       has_matpom () {
-        return this.payments.matpom[0] || this.payments.matpom[1]
+        return this.matpom1 || this.matpom2
       },
     },
     methods: {
@@ -155,11 +142,11 @@
       },
     },
     watch: {
-      'payments.matpom'(nmp) {
-        if(!nmp[0]) {
-          this.payments.matpom[1] = false
+      matpom1(val) {
+        if(!val) {
+          this.matpom2 = false
         }
-      }
+      },
     },
   }
 </script>
@@ -179,7 +166,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    flex-grow: 1;
   }
   .footer p>span:last-child {
     float: right;
@@ -196,36 +182,12 @@
     margin: 0;
     line-height: 24pt;
   }
-  p.field {
-    display: flex;
-    flex-direction: column;
-  }
-  span.field {
-    display: inline-flex;
-    flex-direction: column;
-  }
-  .field>*, .field>span>* {
-    padding-left: 5px;
-    padding-right: 5px;
-    text-indent: 0;
-  }
   .help {
     border-top: 1px solid;
     font-size: 8pt;
     text-align: center;
     line-height: 8pt;
     padding-top: 2px;
-  }
-  .toolbox {
-    background-color: #eef9f6;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 3px;
-    text-indent: 0;
-  }
-  .toolbox * {
-    font-size: 12pt !important;
-    line-height: 12pt;
   }
   .template {
     display: flex;

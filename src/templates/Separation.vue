@@ -1,5 +1,5 @@
 <template>
-  <div class="template">
+  <div class="template" ref="template">
     <div class="header">
       <field-component full v-model="to_title" help="должность руководителя"/>
       <field-component full v-model="to_name" help="Ф.И.О. руководителя"/>
@@ -23,23 +23,16 @@
         </div>
       </toolbox>
       <p>
-        По семейным обстоятельствам прошу внести изменения в график отпусков на
-        <field-component v-model="yarn" help="год" fieldStyle="text-align: center"/>
-        год, а именно: отпуск запланированный графиком отпусков на
-        <field-component v-model="yarn" help="год" fieldStyle="text-align: center"/>
-        год с
-        <field-component v-model="start" help="начало отпуска" fieldStyle="text-align: center"/>
-        количеством
-        <field-component v-model="days" help="дней" fieldStyle="text-align: center"/>
-        {{ declOfNum(days, ['календарный', 'календарных', 'календарных']) }}
-        {{ declOfNum(days, ['день', 'дня', 'дней']) }}, перенести на период
+        Прошу разделить ежегодный оплачиваемый отпуск на части.
         <span v-for="(period, index) in periods" :key="index">
-          c
-          <field-component v-model="period.start" help="начало отпуска" fieldStyle="text-align: center" @input="updatePeriods"/>
-          –
+          {{ parts[index] }} часть –
           <field-component v-model="period.days" help="дней" fieldStyle="text-align: center" @input="updatePeriods"/>
-          {{ declOfNum(period.days, ['календарный', 'календарных', 'календарных']) }}
-          {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}<span v-if="periods.length > 1" class="btn hide-in-print" @click="() => removePeriod(index)">➖</span>{{ index == periods.length - 1 ? '.' : ',' }}
+          {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}
+          (с
+          <field-component v-model="period.start" help="дата начала" fieldStyle="text-align: center" @input="updatePeriods"/>
+          по
+          <field-component v-model="period.end" help="дата окончания" fieldStyle="text-align: center" @input="updatePeriods"/>
+          )<span v-if="periods.length > 1" class="btn hide-in-print" @click="() => removePeriod(index)">➖</span>{{ separation(index, periods.length) }}
         </span>
         <span v-if="periods.length < 5" class="btn hide-in-print" @click="addPeriod">➕</span>
       </p>
@@ -67,31 +60,41 @@
 <script>
   import { sync } from 'vuex-pathify'
   import FieldComponent from '@/components/FieldComponent.vue'
-  
+
   export default {
-    name: 'redistribution',
+    name: 'separation',
     components: { FieldComponent },
+    data() {
+      return {
+        parts: ['Первая', 'вторая', 'третья', 'четвертая', 'пятая'],
+      }
+    },
     computed: {
-      ...sync('document/redistribution@*'),
+      ...sync('document/separation@*'),
     },
     methods: {
       preventLineBreaks(e) {
         if(e.which == 13) e.preventDefault()
+      },
+      declOfNum(n, titles) {
+        return titles[n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
       },
       removePeriod(index) {
         this.periods.splice(index, 1)
         this.updatePeriods()
       },
       addPeriod: function() {
-        this.periods.push({ start: '09.10.2021', days: 14 })
+        this.periods.push({ start: '09.10.2021', end: '27.10.2021', days: 14 })
         this.updatePeriods()
       },
-      declOfNum(n, titles) {
-        return titles[n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
-      },
       updatePeriods() {
-        this.$store.set('document/redistribution@periods', this.periods)
-      }
+        this.$store.set('document/separation@periods', this.periods)
+      },
+      separation(index, count) {
+        if(index == count - 1) { return '.' }
+        else if(index == count -2) {return ' и'}
+        else { return ',' }
+      },
     },
   }
 </script>
@@ -127,19 +130,6 @@
     margin: 0;
     line-height: 24pt;
   }
-  p.field {
-    display: flex;
-    flex-direction: column;
-  }
-  span.field {
-    display: inline-flex;
-    flex-direction: column;
-  }
-  .field>*, .field>span>* {
-    padding-left: 5px;
-    padding-right: 5px;
-    text-indent: 0;
-  }
   .help {
     border-top: 1px solid;
     font-size: 8pt;
@@ -152,8 +142,5 @@
     flex-direction: column;
     justify-content: stretch;
     height: 257mm;
-  }
-  .btn:hover {
-    opacity: 0.6;
   }
 </style>
