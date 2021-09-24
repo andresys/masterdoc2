@@ -66,7 +66,7 @@
         {{ declOfNum(days, ['календарный', 'календарных', 'календарных']) }}
         {{ declOfNum(days, ['день', 'дня', 'дней']) }}.
       </p>
-      
+
       <p v-if="payment_required">
         В связи с уходом в ежегодный оплачиваемый отпуск прошу
         <template v-if="has_matpom">выплатить {{ this.two_matpom ? 'две материальных помащи' : 'материальную помощь' }} в размере денежного содержания,</template>
@@ -77,9 +77,12 @@
 
       <p v-if="perfomance_required">
         На время ежегодного оплачиваемого отпуска исполнение обязанностей
-        <field-component v-model="perfomance_title" help="должность лица исполняющего обязанности"/>
+        {{ from_title }}
+        {{ from_name }}
         прошу возложить на
-        <field-component v-model="perfomance_name" help="Ф.И.О. лица исполняющего обязанности"/>.
+        <field-component v-model="perfomance_title" help="должность лица исполняющего обязанности"/>
+        <span>&nbsp;</span>
+        <field-component v-model="perfomance_name" help="Ф.И.О. лица исполняющего обязанности" after="."/>
       </p>
     </div>
 

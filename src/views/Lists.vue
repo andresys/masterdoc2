@@ -41,7 +41,7 @@
             &nbsp;
           </div>
           <div class="col col-lg-2 text-right">
-            <small>Версия: 0.8 beta от 23.09.2021 </small>
+            <small>Версия: 2.0 beta от 23.09.2021 </small>
           </div>
         </div>
       </div>          

@@ -80,6 +80,19 @@
         left: 35px;
       }
     }
+    &.float-right {
+      float: right;
+      margin-right: 30px;
+      >.panel {
+        right: 5px;
+      }
+    }
+    &.float-left {
+      float: left;
+      >.panel {
+        left: 35px;
+      }
+    }
     .button {
       border-radius: 50%;
       color: #686868;
@@ -110,6 +123,9 @@
         font-size: 12pt !important;
         line-height: 12pt;
         font-family: initial !important;
+      }
+      p {
+        text-align: left;
       }
     }
   }

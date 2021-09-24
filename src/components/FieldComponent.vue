@@ -17,6 +17,11 @@
         v-text="val"
         ref="field"
       />
+      <span
+        v-if="after"
+        v-text="after"
+        class="after"
+      />
     </span>
     <span class="help hide-in-print">{{ help }}</span>
   </component>
@@ -35,6 +40,7 @@
       },
       fieldStyle: String,
       before: String,
+      after: String,
     },
     data () {
       return {
