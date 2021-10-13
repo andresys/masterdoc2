@@ -1,0 +1,11 @@
+// Custom Bootstrap variable overrides go first
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1140px
+);
+
+// Then include the following
+@import 'bootstrap-scss/bootstrap.scss';

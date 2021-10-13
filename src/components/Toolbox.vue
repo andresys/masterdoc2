@@ -128,6 +128,12 @@
         text-align: left;
       }
     }
+    .title {
+      margin-bottom: 10px;
+      font-weight: bold;
+      border-bottom: 1px solid #aeaeae;
+      padding-bottom: 5px;
+    }
   }
   @media print {
     .toolbox {

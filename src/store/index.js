@@ -16,6 +16,7 @@ const store = new Vuex.Store({
 })
 
 store.dispatch('document/fetch')
+store.dispatch('holidays/fetch')
 
 store.subscribe(mutation => {
   if (!mutation.type.startsWith('document/')) return

@@ -32,16 +32,22 @@
     <footer>
       <div class="container">
         <div class="row">
-          <div class="col">
-            © Администрация города Твери, 2021<br>
-            <small>Разработка: отдел информационных ресурсов и технологий Администрации города Твери</small><br>
-            <small><a href="mailto:it@adm.tver.ru?subject=АИС%20Очередники" mb-checked="1" data-tip="">it@adm.tver.ru</a>, (4822) 36-32-80 доб. 1100</small>
-          </div>  
-          <div class="col-md-auto">
-            &nbsp;
+          <div class="col-md-6 text-center text-md-start">
+            <p class="fw-bold">&reg; {{ name }}, {{ year }}</p>
+            <p>
+              <small v-html="description"/>
+            </p>
+            <p>
+              <small>{{ version }}</small>
+            </p>
           </div>
-          <div class="col col-lg-2 text-right">
-            <small>Версия: 2.0 beta от 23.09.2021 </small>
+          <div class="col-md text-center text-md-end align-bottom">
+            <p>
+              <small v-html="support.name"/>
+            </p>
+            <p>
+              <small v-html="support.contact"/>
+            </p>
           </div>
         </div>
       </div>          
@@ -54,7 +60,8 @@
 
   export default {
     computed: {
-      ...get ('app', ['templates']),
+      ...get ('app', ['name', 'year', 'description', 'support', 'templates']),
+      version: () => 'Версия: ' + require('../../package').version,
     },
     methods: {
       getImgUrl(pet) {
@@ -70,6 +77,7 @@
   .lists {
     background-color: white;
     min-height: 100%;
+    font-family: 'Share', cursive;
   }
   header {
     text-align: center;
@@ -111,7 +119,6 @@
         top: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
-        font-family: 'Share', cursive;
       }
       img {
         filter: blur(2px);
@@ -120,6 +127,7 @@
     }
     a:hover {
       background-color: #ffffff25;
+      color: #4A4A4A;
     }
   }
   footer {

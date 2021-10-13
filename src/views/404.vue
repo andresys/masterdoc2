@@ -17,7 +17,7 @@
     <div>
       <span>
         Страница, на которую вы попали, не существует или произошла другая ошибка.<br/>
-        Вернитесь <a @click="$router.go(-1)">Назад</a>
+        Вернитесь <a href="" @click.prevent.stop="$router.back()">Назад</a>
         или перейдите на <a href="/">Главную страницу</a>.
       </span>
     </div>
@@ -25,13 +25,15 @@
 </template>
 
 <script>
-  export default { name: 'ErrorView' }
+  export default {
+    name: 'ErrorView'
+  }
 </script>
 
 <style scope lang="scss">
   main.error_page {
     height: 100%;
-    font-family: Pavanam;
+    font-family: 'Share', cursive;
     font-style: normal;
     color: #444444;
     background-color: white;
@@ -47,7 +49,7 @@
     }
     h2 {
       margin-top: 10px;
-      font-family: Pavanam;
+      font-family: 'Share', cursive;
       font-weight: normal;
       font-size: 26px;
       line-height: 34px;

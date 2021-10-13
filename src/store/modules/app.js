@@ -3,6 +3,13 @@ import { make } from 'vuex-pathify'
 
 // Data
 const state = {
+  name: 'MasterDoc (Мастер док.)',
+  year: new Date().getFullYear(),
+  description: 'Интерактивная система помощи<br/> в подготовки типовых документов',
+  support: {
+    name: 'Разработка и сопровождение системы:<br/> отдел информационных ресурсов и технологий<br/> Администрации города Твери<br/>',
+    contact: 'E-mail: <a href="mailto:it@adm.tver.ru?subject=Мастердок">it@adm.tver.ru</a>, тел.: (4822) 36-32-80 доб. 1100',
+  },
   templates: [
     {
       title: 'Заявление на предоставление ежегодного оплачиваемого отпуска',

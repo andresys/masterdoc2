@@ -5,6 +5,7 @@
 <script>
   // Styles
   import '@/styles/fonts.scss'
+  import '@/styles/bootstrap-custom.scss'
 
   export default {
     name: 'MasterDoc',
@@ -33,9 +34,9 @@
     color: black;
     background: rgba(200, 250, 230, 0.2);
   }
-  .container {
-    max-width: 1024px;
-    margin: 0 auto;
-    padding: 0 10px;
+  @media screen {
+    body.print {
+      display: none;
+    }
   }
 </style>

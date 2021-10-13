@@ -14,6 +14,7 @@
     <div class="content" style="margin-top: 20px;">
       <toolbox>
         <div>
+          <p class="title">Настройки заявления</p>
           <p>
             <label>
               <input type="checkbox" v-model="visa_required">
@@ -24,17 +25,24 @@
       </toolbox>
       <p>
         Прошу разделить ежегодный оплачиваемый отпуск на части.
-        <span v-for="(period, index) in periods" :key="index">
-          {{ parts[index] }} часть –
-          <field-component v-model="period.days" help="дней" fieldStyle="text-align: center" @input="updatePeriods"/>
-          {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}
-          (с
-          <field-component v-model="period.start" help="дата начала" fieldStyle="text-align: center" @input="updatePeriods"/>
-          по
-          <field-component v-model="period.end" help="дата окончания" fieldStyle="text-align: center" @input="updatePeriods"/>
-          )<span v-if="periods.length > 1" class="btn hide-in-print" @click="() => removePeriod(index)">➖</span>{{ separation(index, periods.length) }}
-        </span>
-        <span v-if="periods.length < 5" class="btn hide-in-print" @click="addPeriod">➕</span>
+        <periods-component :hideAdd="periods.length >= 5" @add="addPeriod">
+          <period-item-component
+            v-for="(period, index) in periods"
+            :key="uid(period)"
+            :end="separation(index, periods.length)"
+            :hideRemove="periods.length == 1"
+            @remove="removePeriod(index)"
+          >
+            {{ parts[index] }} часть –
+            <field-component v-model="period.days" help="дней" fieldStyle="text-align: center" @input="updatePeriods"/>
+            {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}
+            (с
+            <field-component v-model="period.start" help="дата начала" fieldStyle="text-align: center" @input="updatePeriods"/>
+            по
+            <field-component v-model="period.end" help="дата окончания" fieldStyle="text-align: center" @input="updatePeriods"/>
+            )
+          </period-item-component><template v-if="periods.length > 0">.</template>
+        </periods-component>
       </p>
     </div>
 
@@ -58,19 +66,23 @@
 </template>
 
 <script>
-  import { sync } from 'vuex-pathify'
+  import { sync, get } from 'vuex-pathify'
   import FieldComponent from '@/components/FieldComponent.vue'
+  import PeriodsComponent from '../components/PeriodsComponent.vue'
+  import PeriodItemComponent from '../components/PeriodItemComponent.vue'
 
   export default {
     name: 'separation',
-    components: { FieldComponent },
-    data() {
-      return {
-        parts: ['Первая', 'вторая', 'третья', 'четвертая', 'пятая'],
-      }
-    },
+    version: '1.1',
+    components: { FieldComponent, PeriodsComponent, PeriodItemComponent },
+    data: () => ({ 
+      hoverItem: {},
+      uids: {},
+      parts: ['Первая', 'вторая', 'третья', 'четвертая', 'пятая'],
+    }),
     computed: {
       ...sync('document/separation@*'),
+      ...get('holidays/*'),
     },
     methods: {
       preventLineBreaks(e) {
@@ -84,16 +96,30 @@
         this.updatePeriods()
       },
       addPeriod: function() {
-        this.periods.push({ start: '09.10.2021', end: '27.10.2021', days: 14 })
+        let moment = require('moment')
+        let last_period = this.periods[this.periods.length - 1]
+        let days = last_period && last_period.days || 7
+        let start = last_period && moment(last_period.start, 'DD.MM.YYYY').add(days, 'days') || moment()
+        let end = start.clone().add(days - 1, 'days')
+        this.periods.push({ start: start.format('DD.MM.YYYY'), end: end.format('DD.MM.YYYY'), days: 7 })
         this.updatePeriods()
       },
       updatePeriods() {
         this.$store.set('document/separation@periods', this.periods)
       },
       separation(index, count) {
-        if(index == count - 1) { return '.' }
+        if(index == count - 1) { return '' }
         else if(index == count -2) {return ' и'}
         else { return ',' }
+      },
+      uid(obj) {
+        this.idx ??= 0
+        let uid = Object.keys(this.uids).find(key => this.uids[key] === obj)
+        if(uid == undefined) {
+          uid = ++this.idx
+          this.uids[uid] = obj
+        }
+        return uid
       },
     },
   }
@@ -129,6 +155,19 @@
     font-size: 14pt;
     margin: 0;
     line-height: 24pt;
+  }
+  p.field {
+    display: flex;
+    flex-direction: column;
+  }
+  span.field {
+    display: inline-flex;
+    flex-direction: column;
+  }
+  .field>*, .field>span>* {
+    padding-left: 5px;
+    padding-right: 5px;
+    text-indent: 0;
   }
   .help {
     border-top: 1px solid;

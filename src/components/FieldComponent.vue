@@ -59,7 +59,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   p.field {
     display: flex;
     flex-direction: column;
@@ -90,16 +90,24 @@
     padding-top: 6px;
     padding-bottom: 6px;
   }
-  @media print {
-    span.field {
-      display: inline !important;
-    }
+
+  @mixin cleanmode() {
     .field>span:first-child {
       background: none;
     }
     .field>span:first-child::before,
     .field>span:first-child::after {
       display: none;
+    }
+    .hide-in-print {
+      visibility: hidden;
+    }
+  }
+  .hover { @include cleanmode; }
+  @media print {
+    @include cleanmode;
+    span.field {
+      display: inline !important;
     }
     .hide-in-print {
       display: none;

@@ -39,6 +39,17 @@ export default {
     }
   },
   created () {
+    let mm2px = (w) => {
+      let e = document.createElement("div")
+      e.style.position = "absolute"
+      e.style.width = "100mm"
+      document.body.appendChild(e)
+      let rect = e.getBoundingClientRect()
+      document.body.removeChild(e)
+      return w * 100 / rect.width
+    }
+    // Initialize zoom
+    this.zoom = Math.min(mm2px(document.body.offsetWidth - 40) / this.page_format_mm[0], this.zoom)
     // Initialize gesture flags
     let start_zoom_gesture = false;
     let start_dist_touch = false;
@@ -101,7 +112,14 @@ export default {
     // If your component is susceptible to be destroyed, don't forget to
     // use window.removeEventListener in the Vue.js beforeDestroy handler
   },
-  // mounted () { this.mounted = true },
+  mounted () {
+    window.addEventListener("beforeprint", this.before_print);
+    window.addEventListener("afterprint", this.after_print);
+  },
+  beforeDestroy () {
+    window.removeEventListener("beforeprint", this.before_print);
+    window.removeEventListener("afterprint", this.after_print);
+  },
   computed: {
     ...get ('app', ['templates']),
     content () { return Array({ template: this.template, props: { class: null }}) },
@@ -111,10 +129,10 @@ export default {
       return [
         // Main commands
         {
-          text: "Новый",
-          title: "Новый документ",
-          icon: "description",
-          click: () => this.$router.push({ name: 'Lists' })
+          text: "Список",
+          title: "Список документов",
+          icon: "view_list",
+          click: () => this.$router.push({ name: 'Index' })
         },
         { text: "Печать", title: "Печать документа", icon: "print", click: () => window.print() },
         { is: "spacer" },
@@ -332,6 +350,12 @@ export default {
         html += '<div class="hide-in-print" style="position: absolute; left: 0; top: 0; right: 0; padding: 3mm 5mm; background: rgba(200, 220, 240, 0.5)"><strong>/// ' + this.current_template_title + '</strong></div>';
       }
       return html;
+    },
+    before_print () {
+      document.body.className = 'print'
+    },
+    after_print () {
+      document.body.className = ''
     },
     // Undo / redo functions examples
     // undo () { if(this.can_undo){ this._mute_next_content_watcher = true; this.content = this.content_history[--this.undo_count]; } },

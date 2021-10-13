@@ -33,14 +33,16 @@
 </template>
 
 <script>
-  import { sync } from 'vuex-pathify'
+  import { sync, get } from 'vuex-pathify'
   import FieldComponent from '@/components/FieldComponent.vue'
 
   export default {
     name: 'performance-of-duties',
+    version: '1.0',
     components: { FieldComponent },
     computed: {
       ...sync('document/performance-of-duties@*'),
+      ...get('holidays/*'),
     },
     methods: {
       preventLineBreaks(e) {

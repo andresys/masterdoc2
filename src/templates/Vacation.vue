@@ -14,6 +14,7 @@
     <div class="content" style="margin-top: 20px;">
       <toolbox>
         <div>
+          <p class="title">Настройки заявления</p>
           <p>Запросить выплаты в соответствии с Положением о муниципальной службе в городе Твери:</p>
           <p style="margin-top: 10px">
             <label class="hide-in-print" style="margin-left: 10px">
@@ -117,15 +118,17 @@
 </template>
 
 <script>
-  import { sync } from 'vuex-pathify'
+  import { sync, get } from 'vuex-pathify'
   import FieldComponent from '@/components/FieldComponent.vue'
   import Toolbox from '@/components/Toolbox.vue'
 
   export default {
     name: 'vacation',
+    version: '1.0',
     components: { FieldComponent, Toolbox },
     computed: {
       ...sync('document/vacation@*'),
+      ...get('holidays/*'),
       payment_required () {
         return this.has_matpom || this.densod
       },

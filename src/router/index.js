@@ -21,7 +21,7 @@ const router = new Router({
   },
   routes: [
     layout('Default', [
-      route('Lists'),
+      route('Index'),
 
       // Document
       route('Document', null, '/document/:template'),

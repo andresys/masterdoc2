@@ -14,6 +14,7 @@
     <div class="content" style="margin-top: 20px;">
       <toolbox>
         <div>
+          <p class="title">Настройки заявления</p>
           <p>
             <label>
               <input type="checkbox" v-model="visa_required">
@@ -32,16 +33,24 @@
         количеством
         <field-component v-model="days" help="дней" fieldStyle="text-align: center"/>
         {{ declOfNum(days, ['календарный', 'календарных', 'календарных']) }}
-        {{ declOfNum(days, ['день', 'дня', 'дней']) }}, перенести на период
-        <span v-for="(period, index) in periods" :key="index">
-          c
-          <field-component v-model="period.start" help="начало отпуска" fieldStyle="text-align: center" @input="updatePeriods"/>
-          –
-          <field-component v-model="period.days" help="дней" fieldStyle="text-align: center" @input="updatePeriods"/>
-          {{ declOfNum(period.days, ['календарный', 'календарных', 'календарных']) }}
-          {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}<span v-if="periods.length > 1" class="btn hide-in-print" @click="() => removePeriod(index)">➖</span>{{ index == periods.length - 1 ? '.' : ',' }}
-        </span>
-        <span v-if="periods.length < 5" class="btn hide-in-print" @click="addPeriod">➕</span>
+        {{ declOfNum(days, ['день', 'дня', 'дней']) }}, перенести на период<!--
+        
+        --><periods-component :hideAdd="periods.length >= 5" @add="addPeriod">
+          <period-item-component
+            v-for="(period, index) in periods"
+            :key="uid(period)"
+            :end="(index < periods.length - 1) && ',' || ''"
+            :hideRemove="periods.length == 1"
+            @remove="removePeriod(index)"
+          ><!--
+            -->c
+            <field-component v-model="period.start" help="начало отпуска" fieldStyle="text-align: center" @input="updatePeriods"/>
+            –
+            <field-component v-model="period.days" help="дней" fieldStyle="text-align: center" @input="updatePeriods"/>
+            {{ declOfNum(period.days, ['календарный', 'календарных', 'календарных']) }}
+            {{ declOfNum(period.days, ['день', 'дня', 'дней']) }}<!--
+          --></period-item-component>.
+        </periods-component>
       </p>
     </div>
 
@@ -65,33 +74,54 @@
 </template>
 
 <script>
-  import { sync } from 'vuex-pathify'
+  import { sync, get } from 'vuex-pathify'
   import FieldComponent from '@/components/FieldComponent.vue'
+  import PeriodsComponent from '../components/PeriodsComponent.vue'
+  import PeriodItemComponent from '../components/PeriodItemComponent.vue'
   
   export default {
     name: 'redistribution',
-    components: { FieldComponent },
+    version: '1.1',
+    components: { FieldComponent, PeriodsComponent, PeriodItemComponent },
+    data: () => ({ 
+      hoverItem: {},
+      uids: {},
+    }),
     computed: {
       ...sync('document/redistribution@*'),
+      ...get('holidays/*'),
     },
     methods: {
       preventLineBreaks(e) {
         if(e.which == 13) e.preventDefault()
+      },
+      declOfNum(n, titles) {
+        return titles[n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
       },
       removePeriod(index) {
         this.periods.splice(index, 1)
         this.updatePeriods()
       },
       addPeriod: function() {
-        this.periods.push({ start: '09.10.2021', days: 14 })
+        let moment = require('moment')
+        let last_period = this.periods[this.periods.length - 1]
+        let days = last_period && last_period.days || 7
+        let start = last_period && moment(last_period.start, 'DD.MM.YYYY').add(days, 'days') || moment()
+        this.periods.push({ start: start.format('DD.MM.YYYY'), days: 7 })
         this.updatePeriods()
-      },
-      declOfNum(n, titles) {
-        return titles[n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
       },
       updatePeriods() {
         this.$store.set('document/redistribution@periods', this.periods)
-      }
+      },
+      uid(obj) {
+        this.idx ??= 0
+        let uid = Object.keys(this.uids).find(key => this.uids[key] === obj)
+        if(uid == undefined) {
+          uid = ++this.idx
+          this.uids[uid] = obj
+        }
+        return uid
+      },
     },
   }
 </script>
@@ -152,8 +182,5 @@
     flex-direction: column;
     justify-content: stretch;
     height: 257mm;
-  }
-  .btn:hover {
-    opacity: 0.6;
   }
 </style>
