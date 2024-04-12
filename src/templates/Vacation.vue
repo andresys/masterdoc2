@@ -60,12 +60,12 @@
       <p>
         Прошу предоставить ежегодный оплачиваемый отпуск c
         <field-component v-model="start" help="дата начала" fieldStyle="text-align: center"/>
-        по
-        <field-component v-model="end" help="дата окончания" fieldStyle="text-align: center"/>
+        <!-- по
+        <field-component v-model="end" help="дата окончания" fieldStyle="text-align: center"/> -->
         количеством
         <field-component v-model="days" help="дней" fieldStyle="text-align: center"/>
         {{ declOfNum(days, ['календарный', 'календарных', 'календарных']) }}
-        {{ declOfNum(days, ['день', 'дня', 'дней']) }}.
+        {{ declOfNum(days, ['день', 'дня', 'дней']) }}, согласно утвержденному графику отпусков.
       </p>
 
       <p v-if="payment_required">
